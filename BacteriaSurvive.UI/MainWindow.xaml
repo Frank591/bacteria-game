@@ -1,0 +1,123 @@
+﻿<Window x:Class="BacteriaSurvive.UI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="MainWindow" Height="500" Width="825">
+    <StackPanel VerticalAlignment="Top">
+        <StackPanel Orientation="Horizontal" Height="30" >
+            <Label Height="30" Width="200">Счетчик (путь к файлу):</Label>
+            <TextBox  Name="tbCountFileName" Height="30" Width="450"></TextBox>            
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Height="30" >
+            <Label Height="30" Width="200">Вектор (путь к файлу):</Label>
+            <TextBox  Name="tbVectorFileName" Height="30" Width="450"></TextBox>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Height="30" >
+            <Label Height="30" Width="200">Матрица (путь к папке):</Label>
+            <TextBox  Name="tbMatrixFolderName" Height="30" Width="450"></TextBox>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Height="30" >
+            <Label Height="30" Width="200">Ширина грида:</Label>
+            <TextBox  Name="tbAreaWidth" Height="30" Width="100"></TextBox>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Height="30" >
+            <Label Height="30" Width="200">Высота грида:</Label>
+            <TextBox  Name="tbAreaHeight" Height="30" Width="100"></TextBox>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Height="30" >
+            <Label Height="30" Width="200">Количество шагов:</Label>
+            <TextBox  Name="tbStepCount" Height="30" Width="100"></TextBox>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal">
+            <StackPanel Width="250">
+                <Label Height="30" Width="200">Стратегия "A":</Label>
+                <StackPanel Orientation="Horizontal">
+                    <Label Width="120">X</Label>
+                    <TextBox Name="tbAStoneX" Width="100"></TextBox>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Label Width="120">Y</Label>
+                    <TextBox Name="tbAStoneY" Width="100"></TextBox>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Label Width="120">Константа мутации</Label>
+                    <TextBox Name="tbAStoneMutationLimit" Width="100"></TextBox>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Label Width="120">Камень %</Label>
+                    <TextBox Name="tbAStonePercent" Width="100"></TextBox>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Label Width="120">Ножницы %</Label>
+                    <TextBox Name="tbAScissorsPercent" Width="100"></TextBox>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Label Width="120">Бумага %</Label>
+                    <TextBox Name="tbAPaperPercent" Width="100"></TextBox>
+                </StackPanel> 
+            </StackPanel>
+
+            <StackPanel Width="250">
+                <Label Height="30" Width="200">Стратегия "B":</Label>
+                <StackPanel Orientation="Horizontal">
+                    <Label Width="120">X</Label>
+                    <TextBox Name="tbBStoneX" Width="100"></TextBox>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Label Width="120">Y</Label>
+                    <TextBox Name="tbBStoneY" Width="100"></TextBox>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Label Width="120">Константа мутации</Label>
+                    <TextBox Name="tbBStoneMutationLimit" Width="100"></TextBox>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Label Width="120">Камень %</Label>
+                    <TextBox Name="tbBStonePercent" Width="100"></TextBox>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Label Width="120">Ножницы %</Label>
+                    <TextBox Name="tbBScissorsPercent" Width="100"></TextBox>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Label Width="120">Бумага %</Label>
+                    <TextBox Name="tbBPaperPercent" Width="100"></TextBox>
+                </StackPanel>
+            </StackPanel>
+
+
+            <StackPanel Width="250">
+                <Label Height="30" Width="200">Стратегия "С":</Label>
+                <StackPanel Orientation="Horizontal">
+                    <Label Width="120">X</Label>
+                    <TextBox Name="tbCStoneX" Width="100"></TextBox>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Label Width="120">Y</Label>
+                    <TextBox Name="tbCStoneY" Width="100"></TextBox>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Label Width="120">Константа мутации</Label>
+                    <TextBox Name="tbCStoneMutationLimit" Width="100"></TextBox>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Label Width="120">Камень %</Label>
+                    <TextBox Name="tbCStonePercent" Width="100"></TextBox>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Label Width="120">Ножницы %</Label>
+                    <TextBox Name="tbCScissorsPercent" Width="100"></TextBox>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Label Width="120">Бумага %</Label>
+                    <TextBox Name="tbCPaperPercent" Width="100"></TextBox>
+                </StackPanel>
+            </StackPanel>
+
+
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Height="30" Margin="20 20 0 0" >
+            <Button Name="btnRun" Margin="0 0 40 0" Click="btnRun_Click">Запустить</Button>
+        </StackPanel>
+
+    </StackPanel>
+</Window>
