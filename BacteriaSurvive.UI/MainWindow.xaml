@@ -99,7 +99,7 @@
 
             <StackPanel Width="250">
                 <StackPanel Orientation="Horizontal">
-                    <Label Height="30" Width="120">Стратегия "C" (код 3):</Label>
+                    <Label Height="30" Width="120">Стратегия "C"(код 3):</Label>
                     <CheckBox Name="chkCEnabled" Content="Включить" Margin="10 7 0 0" IsChecked="True" Unchecked="chkCEnabled_Checked" Checked="chkCEnabled_Checked"></CheckBox>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
