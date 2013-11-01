@@ -1,35 +1,44 @@
 ﻿<Window x:Class="BacteriaSurvive.UI.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="MainWindow" Height="500" Width="825">
+        Title="MainWindow" Height="430" Width="825">
     <StackPanel VerticalAlignment="Top">
-        <StackPanel Orientation="Horizontal" Height="30" >
-            <Label Height="30" Width="200">Счетчик (путь к файлу):</Label>
-            <TextBox  Name="tbCountFileName" Height="30" Width="450"></TextBox>            
+
+        <StackPanel Orientation="Horizontal" Height="60" >
+            <Label Height="30" Width="100">Количество игр:</Label>
+            <TextBox  Name="tbGamesCount" Height="30" Width="50"></TextBox>
+            <StackPanel Margin="30 10 0 0">
+                <CheckBox Content="Включить сохранение векторов" Name="chkVectorSaverEnabled"></CheckBox>
+                <CheckBox Content="Включить сохранение количества" Name="chkCountSaverEnabled"></CheckBox>
+                <CheckBox Content="Включить сохранение эволюции грида" Name="chkGridSaverEnabled"></CheckBox>
+            </StackPanel>
         </StackPanel>
+
         <StackPanel Orientation="Horizontal" Height="30" >
-            <Label Height="30" Width="200">Вектор (путь к файлу):</Label>
-            <TextBox  Name="tbVectorFileName" Height="30" Width="450"></TextBox>
+            <Label Height="30" Width="200">Папка для сохранения результатов:</Label>
+            <TextBox  Name="tbResultsDir" Height="30" Width="450"></TextBox>
+            <Button Content="..."  Width="20" Margin="0,5,0,0" Height="20" VerticalAlignment="Top" Click="Button_Click"/>
         </StackPanel>
-        <StackPanel Orientation="Horizontal" Height="30" >
-            <Label Height="30" Width="200">Матрица (путь к папке):</Label>
-            <TextBox  Name="tbMatrixFolderName" Height="30" Width="450"></TextBox>
-        </StackPanel>
-        <StackPanel Orientation="Horizontal" Height="30" >
-            <Label Height="30" Width="200">Ширина грида:</Label>
-            <TextBox  Name="tbAreaWidth" Height="30" Width="100"></TextBox>
-        </StackPanel>
-        <StackPanel Orientation="Horizontal" Height="30" >
-            <Label Height="30" Width="200">Высота грида:</Label>
-            <TextBox  Name="tbAreaHeight" Height="30" Width="100"></TextBox>
-        </StackPanel>
-        <StackPanel Orientation="Horizontal" Height="30" >
-            <Label Height="30" Width="200">Количество шагов:</Label>
-            <TextBox  Name="tbStepCount" Height="30" Width="100"></TextBox>
+        <StackPanel Orientation="Horizontal" Margin="0 10 0 0">
+            <StackPanel Orientation="Horizontal" Height="30" >
+                <Label Height="30" Width="110">Ширина грида:</Label>
+                <TextBox  Name="tbAreaWidth" Height="30" Width="100"></TextBox>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Height="30" Margin="20 0 0  0" >
+                <Label Height="30" Width="110">Высота грида:</Label>
+                <TextBox  Name="tbAreaHeight" Height="30" Width="100"></TextBox>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Height="30"  Margin="20 0 0  0">
+                <Label Height="30" Width="110">Количество шагов:</Label>
+                <TextBox  Name="tbStepCount" Height="30" Width="100"></TextBox>
+            </StackPanel>
         </StackPanel>
         <StackPanel Orientation="Horizontal">
             <StackPanel Width="250">
-                <Label Height="30" Width="200">Стратегия "A":</Label>
+                <StackPanel Orientation="Horizontal">
+                    <Label Height="30" Width="130">Стратегия "A"(код 1):</Label>
+                    <CheckBox Name="chkAEnabled" Content="Включить" Margin="10 7 0 0" IsChecked="True" Unchecked="chkAEnabled_Checked" Checked="chkAEnabled_Checked"></CheckBox>
+                </StackPanel>
                 <StackPanel Orientation="Horizontal">
                     <Label Width="120">X</Label>
                     <TextBox Name="tbAStoneX" Width="100"></TextBox>
@@ -53,11 +62,14 @@
                 <StackPanel Orientation="Horizontal">
                     <Label Width="120">Бумага %</Label>
                     <TextBox Name="tbAPaperPercent" Width="100"></TextBox>
-                </StackPanel> 
+                </StackPanel>
             </StackPanel>
 
             <StackPanel Width="250">
-                <Label Height="30" Width="200">Стратегия "B":</Label>
+                <StackPanel Orientation="Horizontal">
+                    <Label Height="30" Width="120">Стратегия "B"(код 2):</Label>
+                    <CheckBox Name="chkBEnabled" Content="Включить" Margin="10 7 0 0" IsChecked="True" Unchecked="chkBEnabled_Checked" Checked="chkBEnabled_Checked"></CheckBox>
+                </StackPanel>
                 <StackPanel Orientation="Horizontal">
                     <Label Width="120">X</Label>
                     <TextBox Name="tbBStoneX" Width="100"></TextBox>
@@ -86,7 +98,10 @@
 
 
             <StackPanel Width="250">
-                <Label Height="30" Width="200">Стратегия "С":</Label>
+                <StackPanel Orientation="Horizontal">
+                    <Label Height="30" Width="120">Стратегия "C" (код 3):</Label>
+                    <CheckBox Name="chkCEnabled" Content="Включить" Margin="10 7 0 0" IsChecked="True" Unchecked="chkCEnabled_Checked" Checked="chkCEnabled_Checked"></CheckBox>
+                </StackPanel>
                 <StackPanel Orientation="Horizontal">
                     <Label Width="120">X</Label>
                     <TextBox Name="tbCStoneX" Width="100"></TextBox>
@@ -118,6 +133,6 @@
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Height="30" Margin="20 20 0 0" >
             <Button Name="btnRun" Margin="0 0 40 0" Click="btnRun_Click">Запустить</Button>
         </StackPanel>
-
+        <ProgressBar Name="progressBar" Height="20" ></ProgressBar>
     </StackPanel>
 </Window>

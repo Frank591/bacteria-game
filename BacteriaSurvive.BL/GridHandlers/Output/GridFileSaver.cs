@@ -14,10 +14,8 @@ namespace BacteriaSurvive.BL.GridHandlers.Output
         {
             _folderPath = folderPath;
             if (!Directory.Exists(_folderPath))
-                throw new DirectoryNotFoundException(" не найдена диретори€ "+_folderPath);
-            string calculateResultsFolderName = "FileGridSaver_–ассчет от " + DateTime.Now.ToString("yyyyMMdd hh_mm");
-            _folderPath = Path.Combine(_folderPath, calculateResultsFolderName);
-            Directory.CreateDirectory(_folderPath);
+                throw new DirectoryNotFoundException(" не найдена диретори€ дл€ сохранени€ результатов грида "+_folderPath);
+            
         }
 
 
