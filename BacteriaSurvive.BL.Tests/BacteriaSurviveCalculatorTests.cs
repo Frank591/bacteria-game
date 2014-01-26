@@ -1,6 +1,4 @@
-﻿using System;
-using System.IO;
-using BacteriaSurvive.BL.GridHandlers;
+﻿using BacteriaSurvive.BL.GridHandlers;
 using BacteriaSurvive.BL.GridHandlers.Output;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -21,7 +19,7 @@ namespace BacteriaSurvive.BL.Tests
         public void Calculate100StepsAndUseCountFileSaver()
         {
 
-            IGridHandler gridHandler = new BacteriaCountFileSaver(@"D:\temp\bacteriaLogCountTest.txt");
+            IGridHandler gridHandler = new BacteriaCountFileSaver(@"C:\temp\bacteriaLogCountTest.txt");
             BacteriaSurviveCalculator bacteriaSurviveCalculator = new BacteriaSurviveCalculator(4, 4, 50, gridHandler);
 
             bacteriaSurviveCalculator.InsertBacteria(new Bacteria(100, 0, 0, BacteriaType.A, 4), 0, 0);
@@ -37,7 +35,7 @@ namespace BacteriaSurvive.BL.Tests
         public void Calculate100StepsAndUseGridFileSaver()
         {
 
-            IGridHandler gridHandler = new GridFileSaver(@"D:\temp");
+            IGridHandler gridHandler = new GridFileSaver(@"C:\temp");
             BacteriaSurviveCalculator bacteriaSurviveCalculator = new BacteriaSurviveCalculator(100, 100, 100, gridHandler);
 
             bacteriaSurviveCalculator.InsertBacteria(new Bacteria(100, 0, 0, BacteriaType.A, 4), 0, 0);
@@ -55,9 +53,9 @@ namespace BacteriaSurvive.BL.Tests
         public void Calculate100StepsAndUserAllSavers()
         {
 
-            IGridHandler vectorHandler = new BacteriaStrategyVectorFileSaver(@"D:\temp\bacteriaLogVectorTest.txt");
-            IGridHandler gridHandler = new GridFileSaver(@"D:\temp");
-            IGridHandler countHandler = new BacteriaCountFileSaver(@"D:\temp\bacteriaLogCountTest.txt");
+            IGridHandler vectorHandler = new BacteriaStrategyVectorFileSaver(@"C:\temp\bacteriaLogVectorTest.txt");
+            IGridHandler gridHandler = new GridFileSaver(@"C:\temp");
+            IGridHandler countHandler = new BacteriaCountFileSaver(@"C:\temp\bacteriaLogCountTest.txt");
 
             GridHandlersQueue handlersQueue = new GridHandlersQueue();
             handlersQueue.Add(vectorHandler);
@@ -78,9 +76,9 @@ namespace BacteriaSurvive.BL.Tests
         public void TestBacteryWidthMutation0()
         {
 
-            IGridHandler vectorHandler = new BacteriaStrategyVectorFileSaver(@"D:\temp\bacteriaLogVectorTest.txt");
-            IGridHandler gridHandler = new GridFileSaver(@"D:\temp");
-            IGridHandler countHandler = new BacteriaCountFileSaver(@"D:\temp\bacteriaLogCountTest.txt");
+            IGridHandler vectorHandler = new BacteriaStrategyVectorFileSaver(@"C:\temp\bacteriaLogVectorTest.txt");
+            IGridHandler gridHandler = new GridFileSaver(@"C:\temp");
+            IGridHandler countHandler = new BacteriaCountFileSaver(@"C:\temp\bacteriaLogCountTest.txt");
 
 
 

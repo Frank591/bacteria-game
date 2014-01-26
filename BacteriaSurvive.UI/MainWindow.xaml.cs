@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Configuration;
 using System.IO;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Forms;
 using BacteriaSurvive.BL;
@@ -21,7 +21,7 @@ namespace BacteriaSurvive.UI
 
         private  FolderBrowserDialog _folderBrowserDialog = new FolderBrowserDialog();
 
-        BackgroundWorker worker;
+
 
         public MainWindow()
         {
@@ -41,8 +41,6 @@ namespace BacteriaSurvive.UI
             
             
 
-            worker = new BackgroundWorker();
-            worker.DoWork += new DoWorkEventHandler(worker_DoWork);     
 
         }
 
@@ -50,42 +48,33 @@ namespace BacteriaSurvive.UI
 
 
 
-        void worker_DoWork(object sender, DoWorkEventArgs e)
+       
+
+        private void OnGameCalculationEnd()
         {
-
-            CalculationParams calculationParams = e.Argument as CalculationParams;
-
-            RunGamesCalculation(calculationParams);
-            MessageBox.Show("Готово!");
+            progressBar.Value = progressBar.Value + 1;
         }
 
-        delegate void UpdateProgressBarDelegate(DependencyProperty dp, object value);
 
 
-
-        private void RunGamesCalculation(CalculationParams calculationParams)
+        private void RunGameCalculation(CalculationParams calculationParams)
         {
 
-            UpdateProgressBarDelegate updProgress = new UpdateProgressBarDelegate(progressBar.SetValue);
-            double value = 0;
-
-
-
-            string vectorSaverResultsDir = Path.Combine(calculationParams.ResultsDir, "VectorSaverResults");
+            string vectorSaverResultsDir = Path.Combine(calculationParams.StatisticResultsDir, "VectorSaverResults");
             if (!Directory.Exists(vectorSaverResultsDir))
                 Directory.CreateDirectory(vectorSaverResultsDir);
 
-            string countSaverResultsDir = Path.Combine(calculationParams.ResultsDir, "BacteriaCountSaverResults");
+            string countSaverResultsDir = Path.Combine(calculationParams.StatisticResultsDir, "BacteriaCountSaverResults");
             if (!Directory.Exists(countSaverResultsDir))
                 Directory.CreateDirectory(countSaverResultsDir);
 
-            string gridSaverResultsDir = Path.Combine(calculationParams.ResultsDir, "gridSaverResults");
+            string gridSaverResultsDir = Path.Combine(calculationParams.StatisticResultsDir, "gridSaverResults");
             if (!Directory.Exists(gridSaverResultsDir))
                 Directory.CreateDirectory(gridSaverResultsDir);
 
 
 
-            string statisticsFilePath = Path.Combine(calculationParams.ResultsDir, "statistics.txt");
+            string statisticsFilePath = Path.Combine(calculationParams.StatisticResultsDir, "statistics.txt");
 
 
            
@@ -96,9 +85,8 @@ namespace BacteriaSurvive.UI
 
                 BacteriaIncubator bacteriaIncubator=new BacteriaIncubator(0,new Random());
 
-                for (int i = 0; i < calculationParams.GamesCount; i++)
+                for (int i = 0; i < calculationParams.GamesStartIndex; i++)
                 {
-                
                     IList<BacteriaCoordinates> clonedPlayers=new List<BacteriaCoordinates>();
 
                     foreach (var player in calculationParams.Players)
@@ -106,8 +94,6 @@ namespace BacteriaSurvive.UI
                         BacteriaCoordinates clonedPlayer = new BacteriaCoordinates(bacteriaIncubator.Clone(player.Bacteria),player.X,player.Y);
                         clonedPlayers.Add(clonedPlayer);
                     }
-
-
                     string iterationName = "iteration_" + i;
                     string vectorResultsFilePath = Path.Combine(vectorSaverResultsDir, iterationName + ".txt");
                     string countResultsFilePath = Path.Combine(countSaverResultsDir, iterationName + ".txt");
@@ -137,12 +123,6 @@ namespace BacteriaSurvive.UI
                         handlersQueue.Add(gridHandler);
                     }
 
-
-
-
-
-
-
                     BacteriaSurviveCalculator bacteriaSurviveCalculator = new BacteriaSurviveCalculator(calculationParams.AreaWidth, calculationParams.AreaHeight, calculationParams.StepCount, handlersQueue);
                     foreach (BacteriaCoordinates player in clonedPlayers)
                     {
@@ -156,11 +136,10 @@ namespace BacteriaSurvive.UI
 
                     file.WriteLine(i + " " + gameResult.IterationNumber + " " + winnerType);
 
-                    Dispatcher.Invoke(updProgress, new object[] { System.Windows.Controls.ProgressBar.ValueProperty, ++value });
-
                 }
 
             }
+            calculationParams.RaiseGameCalculationEndEvent();
         }
 
 
@@ -295,7 +274,12 @@ namespace BacteriaSurvive.UI
                                                                         resultsDir, isCountSaverEnebled,
                                                                         isVectorSaverEnebled, isGridSaverEnebled,
                                                                         players);
-            worker.RunWorkerAsync(calculationParams);
+            calculationParams.GameCalculationEnd += OnGameCalculationEnd;
+
+            var task1 = new Task(() => RunGamesCalculation(calculationParams),
+                    TaskCreationOptions.LongRunning );
+            task1.Start();
+
         }
 
         private void chkAEnabled_Checked(object sender, RoutedEventArgs e)

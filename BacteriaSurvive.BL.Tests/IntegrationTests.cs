@@ -9,13 +9,15 @@ namespace BacteriaSurvive.BL.Tests
     [TestClass]
     public class IntegrationTests
     {
+       
+
 
         [TestMethod]
         public void RunGame100Times()
         {
 
 
-            string resultsDir = @"D:\temp\тестовый расчет_" + DateTime.Now.ToString("yyyyMMdd") + "_" + DateTime.Now.ToString("hh_mm");
+            string resultsDir = @"C:\temp\тестовый расчет_" + DateTime.Now.ToString("yyyyMMdd") + "_" + DateTime.Now.ToString("hh_mm");
 
             if (!Directory.Exists(resultsDir))
                 Directory.CreateDirectory(resultsDir);
@@ -92,6 +94,6 @@ namespace BacteriaSurvive.BL.Tests
             }
 
         }
-        
+
     }
 }
