@@ -10,6 +10,8 @@ namespace BacteriaSurvive.BL
     {
         private readonly uint _stepCount;
         private readonly IGridHandler _gridHadler;
+        
+        private readonly IGameAreaFactory<GameCenter> _gameCenterAreaFactory;
 
         private FindGameWinnerStrategy _findGameWinnerStrategy=new FindGameWinnerStrategy();
 
@@ -18,44 +20,37 @@ namespace BacteriaSurvive.BL
         private ExpansionManager _expansionManager;
 
 
-        private SquareArea<Bacteria> _area;
+        private FlatGameArea<Bacteria> _bacteriaArea;
 
 
-        public BacteriaSurviveCalculator(int areaWidth, int areaHeight, uint stepCount, IGridHandler gridHadler)
+        public BacteriaSurviveCalculator(int areaWidth, int areaHeight, uint stepCount, IGridHandler gridHadler, IGameAreaFactory<Bacteria> bacteriaAreaFactory, IGameAreaFactory<GameCenter> gameCenterAreaFactory)
         {
             
             _stepCount = stepCount;
             _gridHadler = gridHadler;
-            _area=new SquareArea<Bacteria>(areaWidth,areaHeight);
+            _gameCenterAreaFactory = gameCenterAreaFactory;
+            _bacteriaArea = bacteriaAreaFactory.CreateGameArea();
             _random = new Random();
             _bacteriaIncubatorsByMutationLimit = new Dictionary<int, BacteriaIncubator>();
             _expansionManager=new ExpansionManager(_random);
-            
 
-
-         /*   for (int i = 0; i < areaWidth; i++)
-            {
-                for (int j = 0; j < areaHeight; j++)
-                {
-                    _grid[i, j] = null;
-                }
-            }*/
+       
         }
 
 
       
      public FlatGameArea<Bacteria> GetArea()
      {
-         return _area;
+         return _bacteriaArea;
      }
 
 
      public void InsertBacteria(Bacteria bacteria, int x, int y)
      {
 
-         if (!_area.IsInArea(x,y)) 
+         if (!_bacteriaArea.IsInArea(x, y)) 
              throw new ArgumentOutOfRangeException("210844AD-6960-4156-BBE6-6AAAABC281BC:пытаемся посадить бактерию за пределы области");
-         _area.Grid[x, y] = bacteria;
+         _bacteriaArea.Grid[x, y] = bacteria;
 
          if (!_bacteriaIncubatorsByMutationLimit.ContainsKey(bacteria.CommonMutationLimit))
          {
@@ -74,16 +69,18 @@ namespace BacteriaSurvive.BL
 
            for (int step = 0; step < _stepCount; step++)
            {
-               FlatGameArea<GameCenter> gameCenterArea=new SquareArea<GameCenter>(_area.Width, _area.Height);
+               FlatGameArea<GameCenter> gameCenterArea=_gameCenterAreaFactory.CreateGameArea();
                
-               for (int i = 0; i < _area.Width; i++)
+               for (int i = 0; i < _bacteriaArea.Width; i++)
                {
-                   for (int j = 0; j < _area.Height; j++)
+                   for (int j = 0; j < _bacteriaArea.Height; j++)
                    {
-                       if (_area.Grid[i,j]==null)
+                       if (!_bacteriaArea.IsInArea(i,j))
+                           continue;
+                       if (_bacteriaArea.Grid[i, j] == null)
                            continue;
 
-                       Bacteria currentCellBacteria = _area.Grid[i, j];
+                       Bacteria currentCellBacteria = _bacteriaArea.Grid[i, j];
                        Bacteria childBacteria1 = _bacteriaIncubatorsByMutationLimit[currentCellBacteria.CommonMutationLimit].GenerateChild(currentCellBacteria);
 
                        if (gameCenterArea.Grid[i, j] == null)
@@ -96,26 +93,26 @@ namespace BacteriaSurvive.BL
                        GridPoint top = null;
                        int topX = i;
                        int topY = j-1;
-                       if (topY >= 0)
-                           top = new GridPoint(_area.Grid[topX, topY], new Point(topX, topY));
+                       if (_bacteriaArea.IsInArea(topX,topY))
+                           top = new GridPoint(_bacteriaArea.Grid[topX, topY], new Point(topX, topY));
 
                        GridPoint bot = null;
                        int botX = i;
                        int botY = j + 1;
-                       if (botY <_area.Height)
-                           bot = new GridPoint(_area.Grid[botX, botY], new Point(botX, botY));
+                       if (_bacteriaArea.IsInArea(botX, botY))
+                           bot = new GridPoint(_bacteriaArea.Grid[botX, botY], new Point(botX, botY));
 
                        GridPoint left = null;
                        int leftX = i-1;
                        int leftY = j;
-                       if (leftX >= 0)
-                           left = new GridPoint(_area.Grid[leftX, leftY], new Point(leftX, leftY));
+                       if (_bacteriaArea.IsInArea(leftX, leftY))
+                           left = new GridPoint(_bacteriaArea.Grid[leftX, leftY], new Point(leftX, leftY));
 
                        GridPoint right = null;
                        int rightX = i + 1;
                        int rightY = j;
-                       if (rightX < _area.Width)
-                           right = new GridPoint(_area.Grid[rightX, rightY], new Point(rightX, rightY));
+                       if (_bacteriaArea.IsInArea(rightX, rightY))
+                           right = new GridPoint(_bacteriaArea.Grid[rightX, rightY], new Point(rightX, rightY));
 
                        GridPoint expansionPoint= _expansionManager.GetExpansionPoint(new List<GridPoint>() {top, right, bot, left});
 
@@ -132,33 +129,33 @@ namespace BacteriaSurvive.BL
 
 
 
-               _gridHadler.Handle(_area.Grid);
-               gameWinnerBacteriaType = _findGameWinnerStrategy.GetWinner(_area.Grid);
+               _gridHadler.Handle(_bacteriaArea.Grid);
+               gameWinnerBacteriaType = _findGameWinnerStrategy.GetWinner(_bacteriaArea.Grid);
                if (gameWinnerBacteriaType.HasValue)
                {
                    return new GameResult(step, gameWinnerBacteriaType);
                }
 
-               for (int i = 0; i < _area.Width; i++)
+               for (int i = 0; i < _bacteriaArea.Width; i++)
                {
-                   for (int j = 0; j < _area.Height; j++)
+                   for (int j = 0; j < _bacteriaArea.Height; j++)
                    {
-                       _area.Grid[i, j] = null;
+                       _bacteriaArea.Grid[i, j] = null;
                    }
                }
 
 
 
-               for (int i = 0; i < _area.Width; i++)
+               for (int i = 0; i < _bacteriaArea.Width; i++)
                {
-                   for (int j = 0; j < _area.Height; j++)
+                   for (int j = 0; j < _bacteriaArea.Height; j++)
                    {
 
                        GameCenter currGameCenter = gameCenterArea.Grid[i, j];
                        if (currGameCenter != null)
                        {
                            Bacteria winner = currGameCenter.Play();
-                           _area.Grid[i, j] = winner;
+                           _bacteriaArea.Grid[i, j] = winner;
                        }
 
                    }
@@ -166,8 +163,8 @@ namespace BacteriaSurvive.BL
            }
 
 
-           _gridHadler.Handle(_area.Grid);
-           gameWinnerBacteriaType = _findGameWinnerStrategy.GetWinner(_area.Grid);
+           _gridHadler.Handle(_bacteriaArea.Grid);
+           gameWinnerBacteriaType = _findGameWinnerStrategy.GetWinner(_bacteriaArea.Grid);
            if (gameWinnerBacteriaType.HasValue)
            {
                return new GameResult((int)_stepCount, gameWinnerBacteriaType);
