@@ -50,10 +50,10 @@
     <Compile Include="ExpansionManager.cs" />
     <Compile Include="GameArea\GameAreaUtilsService.cs" />
     <Compile Include="GameArea\IGameAreaFactory.cs" />
+    <Compile Include="GameArea\PolygonGameAreaFactory.cs" />
     <Compile Include="GameArea\SquareArea.cs" />
     <Compile Include="GameArea\SquareGameAreaFactory.cs" />
-    <Compile Include="GameArea\TestGameArea.cs" />
-    <Compile Include="GameArea\TriangleGameArea.cs" />
+    <Compile Include="GameArea\PolygonGameArea.cs" />
     <Compile Include="GameCenter.cs" />
     <Compile Include="GameResult.cs" />
     <Compile Include="GridHandlers\FindGameWinnerStrategy.cs" />

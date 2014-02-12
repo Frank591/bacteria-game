@@ -57,7 +57,7 @@
     <Compile Include="BacteriaIncubatorTests.cs" />
     <Compile Include="GameCenterTests.cs" />
     <Compile Include="IntegrationTests.cs" />
-    <Compile Include="GameAreaTest.cs" />
+    <Compile Include="GameAreaTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BacteriaSurvive.BL\BacteriaSurvive.BL.csproj">

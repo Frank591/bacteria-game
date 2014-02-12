@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 
 namespace BacteriaSurvive.BL.GameArea
 {
@@ -46,9 +47,9 @@ namespace BacteriaSurvive.BL.GameArea
             }
             else
             {
-                for (int x = minX + 1; x < maxX; x++)
+                for (int x = minX; x <= maxX; x++)
                 {
-                    for (int y = minY + 1; y < maxY; y++)
+                    for (int y = minY; y <= maxY; y++)
                     {
                         if (y == Math.Round(k * x + b))
                         {
@@ -58,6 +59,8 @@ namespace BacteriaSurvive.BL.GameArea
                 }
             }
 
+            linePoints.Remove(point1);
+            linePoints.Remove(point2);
             return linePoints;
         }
 
@@ -66,5 +69,32 @@ namespace BacteriaSurvive.BL.GameArea
         {
             return points.Contains(target);
         }
+
+
+        public static int GetMaxXStep(IList<Point> points)
+        {
+            int maxXStep = 0;
+            if (points.Count<2)
+                return maxXStep;
+
+            IList<Point> orderedPoints=points.OrderBy(p => p.X).ToList();
+            
+
+            for (int i = 0; i < orderedPoints.Count-1; i++)
+            {
+                Point currPoint = orderedPoints[i];
+                if (currPoint.X<0)
+                    throw new ArgumentOutOfRangeException("E71BC87E-D17E-41CB-939E-26E3695939A5: x<0");
+                Point nextPoint = orderedPoints[i + 1];
+                if (nextPoint.X < 0)
+                    throw new ArgumentOutOfRangeException("E71BC87E-D17E-41CB-939E-26E3695939A6: x<0");
+
+                int currXStep = Math.Abs(currPoint.X - nextPoint.X );
+                maxXStep = Math.Max(currXStep, maxXStep);
+            }
+
+            return maxXStep;
+        }
+
     }
 }

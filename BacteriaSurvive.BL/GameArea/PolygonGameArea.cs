@@ -4,12 +4,12 @@ using System.Drawing;
 
 namespace BacteriaSurvive.BL.GameArea
 {
-    public class TestGameArea<T>:FlatGameArea<T> where T:class 
+    public class PolygonGameArea<T>:FlatGameArea<T> where T:class 
     {
         private readonly IList<Point> _nodePoints;
         private readonly IList<Point> _boundaryPoints;
 
-        public TestGameArea(int width, int height, IList<Point> nodePoints)
+        public PolygonGameArea(int width, int height, IList<Point> nodePoints)
             : base(width, height)
         {
             _nodePoints = nodePoints;
@@ -49,7 +49,7 @@ namespace BacteriaSurvive.BL.GameArea
         }
 
         public override bool IsInArea(int x, int y)
-        {
+        { 
             if ((x<0)||(x>Width))
                 throw new ArgumentOutOfRangeException("071B2775-8F78-40EB-816F-F6CB7BDBD10E: x<0 or x>area width");
             if ((y < 0) || (y > Height))
@@ -93,7 +93,11 @@ namespace BacteriaSurvive.BL.GameArea
                 }
             }
             if (crossPoints.Count%2 == 0)
-                return false;
+            {
+                int maxXStep = GameAreaUtilsService.GetMaxXStep(crossPoints);
+                if (maxXStep>1)
+                    return false;
+            }
 
             if ((topCrossPoints.Count>0) && (botCrossPoints.Count>0))
                 return true;

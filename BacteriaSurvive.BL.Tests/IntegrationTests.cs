@@ -77,7 +77,7 @@ namespace BacteriaSurvive.BL.Tests
                     SquareGameAreaFactory<Bacteria> bacteriaAreaFactory = new SquareGameAreaFactory<Bacteria>(4, 4);
                     SquareGameAreaFactory<GameCenter> gameCenterAreaFactory = new SquareGameAreaFactory<GameCenter>(4, 4);
 
-                    BacteriaSurviveCalculator bacteriaSurviveCalculator = new BacteriaSurviveCalculator(4, 4, 100, handlersQueue,bacteriaAreaFactory,gameCenterAreaFactory);
+                    BacteriaSurviveCalculator bacteriaSurviveCalculator = new BacteriaSurviveCalculator(100, handlersQueue,bacteriaAreaFactory,gameCenterAreaFactory);
 
                     bacteriaSurviveCalculator.InsertBacteria(new Bacteria(100, 0, 0, BacteriaType.A, 10), 0, 0);
                     bacteriaSurviveCalculator.InsertBacteria(new Bacteria(0, 100, 0, BacteriaType.B, 8), 3, 0);

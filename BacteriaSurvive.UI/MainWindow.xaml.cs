@@ -123,7 +123,7 @@ namespace BacteriaSurvive.UI
                         handlersQueue.Add(gridHandler);
                     }
 
-                    BacteriaSurviveCalculator bacteriaSurviveCalculator = new BacteriaSurviveCalculator(calculationParams.AreaWidth, calculationParams.AreaHeight, calculationParams.StepCount, handlersQueue);
+                    BacteriaSurviveCalculator bacteriaSurviveCalculator = new BacteriaSurviveCalculator(calculationParams.StepCount, handlersQueue);
                     foreach (BacteriaCoordinates player in clonedPlayers)
                     {
                         bacteriaSurviveCalculator.InsertBacteria(player.Bacteria, player.X, player.Y);
