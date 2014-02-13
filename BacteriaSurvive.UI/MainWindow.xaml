@@ -43,6 +43,10 @@
                 <TextBox  Name="tbStepCount" Height="30" Width="100"></TextBox>
             </StackPanel>
         </StackPanel>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Height="30" Margin="20 20 0 0" >
+            <Button Name="btnRun" Margin="0 0 40 0" Click="btnRun_Click">Запустить</Button>
+        </StackPanel>
+        <ProgressBar Name="progressBar" Height="20" ></ProgressBar>
         <StackPanel Orientation="Horizontal">
             <Button Click="BtnAddbacteria_OnClick" Name="btnAddBacteria" >Добавить бактерию</Button>
             <Button Margin="20 0 0 0" Click="ButtonBase_OnClick">Удалить бактерию</Button>
@@ -123,9 +127,6 @@
         </ListView>
 
 
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Height="30" Margin="20 20 0 0" >
-            <Button Name="btnRun" Margin="0 0 40 0" Click="btnRun_Click">Запустить</Button>
-        </StackPanel>
-        <ProgressBar Name="progressBar" Height="20" ></ProgressBar>
+   
     </StackPanel>
 </Window>
