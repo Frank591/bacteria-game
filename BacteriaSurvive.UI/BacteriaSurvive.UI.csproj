@@ -66,6 +66,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="BacteriaCoordinates.cs" />
+    <Compile Include="BacteriaSettings.cs" />
     <Compile Include="CalculationParams.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
