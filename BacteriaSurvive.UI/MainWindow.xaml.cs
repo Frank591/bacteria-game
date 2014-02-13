@@ -6,9 +6,11 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Forms;
 using BacteriaSurvive.BL;
+using BacteriaSurvive.BL.GameArea;
 using BacteriaSurvive.BL.GridHandlers;
 using BacteriaSurvive.BL.GridHandlers.Output;
 using MessageBox = System.Windows.MessageBox;
+using Point = System.Drawing.Point;
 
 
 namespace BacteriaSurvive.UI
@@ -85,7 +87,7 @@ namespace BacteriaSurvive.UI
 
                 BacteriaIncubator bacteriaIncubator=new BacteriaIncubator(0,new Random());
 
-                for (int i = 0; i < calculationParams.GamesStartIndex; i++)
+                for (int i = 0; i < calculationParams.GamesCount; i++)
                 {
                     IList<BacteriaCoordinates> clonedPlayers=new List<BacteriaCoordinates>();
 
@@ -123,10 +125,15 @@ namespace BacteriaSurvive.UI
                         handlersQueue.Add(gridHandler);
                     }
 
-                    BacteriaSurviveCalculator bacteriaSurviveCalculator = new BacteriaSurviveCalculator(calculationParams.StepCount, handlersQueue);
+
+
+                    IGameAreaFactory<Bacteria> bacteriaGameAreaFactory = new PolygonGameAreaFactory<Bacteria>((int)calculationParams.AreaWidth, (int)calculationParams.AreaHeight, calculationParams.Nodes);
+                    IGameAreaFactory<GameCenter> gamCenterGameAreaFactory = new PolygonGameAreaFactory<GameCenter>((int)calculationParams.AreaWidth, (int)calculationParams.AreaHeight, calculationParams.Nodes);
+
+                    BacteriaSurviveCalculator bacteriaSurviveCalculator = new BacteriaSurviveCalculator(calculationParams.StepCount, handlersQueue, bacteriaGameAreaFactory, gamCenterGameAreaFactory);
                     foreach (BacteriaCoordinates player in clonedPlayers)
                     {
-                        bacteriaSurviveCalculator.InsertBacteria(player.Bacteria, player.X, player.Y);
+                        bacteriaSurviveCalculator.InsertBacteria(player.Bacteria, (int)player.X, (int)player.Y);
                     }
 
                     GameResult gameResult = bacteriaSurviveCalculator.EvaluteGrid();
@@ -269,16 +276,17 @@ namespace BacteriaSurvive.UI
 
             progressBar.Maximum = gamesCount;
             progressBar.Value = 0;
-
-            CalculationParams calculationParams = new CalculationParams(gamesCount, areaWidth, areaHeight, stepCount,
+            IList<Point> nodes=new List<Point>();
+            nodes.Add(new Point(0,0));
+            nodes.Add(new Point(0, (int)areaHeight));
+            nodes.Add(new Point((int)areaWidth, (int)areaHeight));
+            nodes.Add(new Point((int)areaWidth, 0));
+            CalculationParams calculationParams = new CalculationParams(gamesCount, areaWidth, areaHeight, stepCount,nodes,
                                                                         resultsDir, isCountSaverEnebled,
                                                                         isVectorSaverEnebled, isGridSaverEnebled,
                                                                         players);
             calculationParams.GameCalculationEnd += OnGameCalculationEnd;
-
-            var task1 = new Task(() => RunGamesCalculation(calculationParams),
-                    TaskCreationOptions.LongRunning );
-            task1.Start();
+            var t = Task.Factory.StartNew(() => RunGameCalculation(calculationParams));
 
         }
 

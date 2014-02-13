@@ -96,8 +96,11 @@ namespace BacteriaSurvive.BL
 
                         try
                         {
-                            if (_bacteriaArea.IsInArea(topX, topY))
-                                top = new GridPoint(_bacteriaArea.Grid[topX, topY], new Point(topX, topY));
+                            if (topY >= 0)
+                            {
+                                if (_bacteriaArea.IsInArea(topX, topY))
+                                    top = new GridPoint(_bacteriaArea.Grid[topX, topY], new Point(topX, topY));
+                            }
                         }
                         catch (ArgumentOutOfRangeException e)
                         {
@@ -111,8 +114,11 @@ namespace BacteriaSurvive.BL
 
                         try
                         {
-                            if (_bacteriaArea.IsInArea(botX, botY))
-                                bot = new GridPoint(_bacteriaArea.Grid[botX, botY], new Point(botX, botY));
+                            if (botY < _bacteriaArea.Height)
+                            {
+                                if (_bacteriaArea.IsInArea(botX, botY))
+                                    bot = new GridPoint(_bacteriaArea.Grid[botX, botY], new Point(botX, botY));
+                            }
                         }
                         catch (ArgumentOutOfRangeException e)
                         {
@@ -124,8 +130,12 @@ namespace BacteriaSurvive.BL
                         int leftY = j;
                         try
                         {
-                            if (_bacteriaArea.IsInArea(leftX, leftY))
-                                left = new GridPoint(_bacteriaArea.Grid[leftX, leftY], new Point(leftX, leftY));
+
+                            if (leftX >= 0)
+                            {
+                                if (_bacteriaArea.IsInArea(leftX, leftY))
+                                    left = new GridPoint(_bacteriaArea.Grid[leftX, leftY], new Point(leftX, leftY));
+                            }
                         }
                         catch (ArgumentOutOfRangeException e)
                         {
@@ -138,8 +148,11 @@ namespace BacteriaSurvive.BL
                         int rightY = j;
                         try
                         {
-                            if (_bacteriaArea.IsInArea(rightX, rightY))
-                                right = new GridPoint(_bacteriaArea.Grid[rightX, rightY], new Point(rightX, rightY));
+                            if (rightX < _bacteriaArea.Width)
+                            {
+                                if (_bacteriaArea.IsInArea(rightX, rightY))
+                                    right = new GridPoint(_bacteriaArea.Grid[rightX, rightY], new Point(rightX, rightY));
+                            }
                         }
                         catch (ArgumentOutOfRangeException e)
                         {
