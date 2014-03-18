@@ -48,6 +48,12 @@
     <Compile Include="BacteriaSurviveCalculator.cs" />
     <Compile Include="EBacteriaAttributes.cs" />
     <Compile Include="ExpansionManager.cs" />
+    <Compile Include="GameArea\GameAreaUtilsService.cs" />
+    <Compile Include="GameArea\IGameAreaFactory.cs" />
+    <Compile Include="GameArea\PolygonGameAreaFactory.cs" />
+    <Compile Include="GameArea\SquareArea.cs" />
+    <Compile Include="GameArea\SquareGameAreaFactory.cs" />
+    <Compile Include="GameArea\PolygonGameArea.cs" />
     <Compile Include="GameCenter.cs" />
     <Compile Include="GameResult.cs" />
     <Compile Include="GridHandlers\FindGameWinnerStrategy.cs" />
@@ -57,6 +63,7 @@
     <Compile Include="GridHandlers\Output\GridFileSaver.cs" />
     <Compile Include="GridHandlers\Output\BacteriaStrategyVectorFileSaver.cs" />
     <Compile Include="GridPoint.cs" />
+    <Compile Include="GameArea\FlatGameArea.cs" />
     <Compile Include="Mutation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

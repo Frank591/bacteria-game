@@ -3,13 +3,16 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Configuration;
 using System.IO;
+using System.Threading.Tasks;
 using System.Windows;
+
 using System.Windows.Forms;
 using BacteriaSurvive.BL;
+using BacteriaSurvive.BL.GameArea;
 using BacteriaSurvive.BL.GridHandlers;
 using BacteriaSurvive.BL.GridHandlers.Output;
 using MessageBox = System.Windows.MessageBox;
-
+using Point = System.Drawing.Point;
 
 namespace BacteriaSurvive.UI
 {
@@ -19,9 +22,9 @@ namespace BacteriaSurvive.UI
     public partial class MainWindow : Window
     {
 
-        private  FolderBrowserDialog _folderBrowserDialog = new FolderBrowserDialog();
+        private FolderBrowserDialog _folderBrowserDialog = new FolderBrowserDialog();
 
-        BackgroundWorker worker;
+
 
         public MainWindow()
         {
@@ -38,14 +41,14 @@ namespace BacteriaSurvive.UI
                 "Выберите папку для сохранения результатов";
             // Do not allow the user to create new files via the FolderBrowserDialog.
             _folderBrowserDialog.ShowNewFolderButton = false;
-            
-            
 
-            worker = new BackgroundWorker();
-            worker.DoWork += new DoWorkEventHandler(worker_DoWork);     
+
+
+
+
+
 
         }
-
 
 
 
@@ -66,8 +69,15 @@ namespace BacteriaSurvive.UI
         private void RunGamesCalculation(CalculationParams calculationParams)
         {
 
+
+
+
+
+
+
+
             UpdateProgressBarDelegate updProgress = new UpdateProgressBarDelegate(progressBar.SetValue);
-            double value = 0;
+    
 
 
 
@@ -85,25 +95,26 @@ namespace BacteriaSurvive.UI
 
 
 
-            string statisticsFilePath = Path.Combine(calculationParams.ResultsDir, "statistics.txt");
+            string statisticsFilePath = Path.Combine(calculationParams.ResultsDir, string.Format("statistics_{0}_{1}.txt", calculationParams.GamesStartIndex, calculationParams.GamesEndIndex));
 
 
-           
+            double value = 0;
+
 
             using (System.IO.StreamWriter file = new System.IO.StreamWriter(statisticsFilePath, true))
             {
                 file.AutoFlush = true;
 
-                BacteriaIncubator bacteriaIncubator=new BacteriaIncubator(0,new Random());
+                BacteriaIncubator bacteriaIncubator = new BacteriaIncubator(0, new Random());
 
-                for (int i = 0; i < calculationParams.GamesCount; i++)
+                for (uint i = calculationParams.GamesStartIndex; i < calculationParams.GamesEndIndex; i++)
                 {
-                
-                    IList<BacteriaCoordinates> clonedPlayers=new List<BacteriaCoordinates>();
+
+                    IList<BacteriaSettings> clonedPlayers = new List<BacteriaSettings>();
 
                     foreach (var player in calculationParams.Players)
                     {
-                        BacteriaCoordinates clonedPlayer = new BacteriaCoordinates(bacteriaIncubator.Clone(player.Bacteria),player.X,player.Y);
+                        BacteriaSettings clonedPlayer = new BacteriaSettings(bacteriaIncubator.Clone(player.Bacteria), player.X, player.Y);
                         clonedPlayers.Add(clonedPlayer);
                     }
 
@@ -141,13 +152,24 @@ namespace BacteriaSurvive.UI
 
 
 
+                    IGameAreaFactory<Bacteria> bacteriaGameAreaFactory = new PolygonGameAreaFactory<Bacteria>((int)calculationParams.AreaWidth, (int)calculationParams.AreaHeight, calculationParams.Nodes);
+                    IGameAreaFactory<GameCenter> gameCenterGameAreaFactory = new PolygonGameAreaFactory<GameCenter>((int)calculationParams.AreaWidth, (int)calculationParams.AreaHeight, calculationParams.Nodes);
 
+                    BacteriaSurviveCalculator bacteriaSurviveCalculator = new BacteriaSurviveCalculator(calculationParams.StepCount, handlersQueue,bacteriaGameAreaFactory,gameCenterGameAreaFactory);
 
-                    BacteriaSurviveCalculator bacteriaSurviveCalculator = new BacteriaSurviveCalculator(calculationParams.AreaWidth, calculationParams.AreaHeight, calculationParams.StepCount, handlersQueue);
-                    foreach (BacteriaCoordinates player in clonedPlayers)
+                    try
                     {
-                        bacteriaSurviveCalculator.InsertBacteria(player.Bacteria, player.X, player.Y);
+                        foreach (BacteriaSettings player in clonedPlayers)
+                        {
+                            bacteriaSurviveCalculator.InsertBacteria(player.Bacteria, player.X, player.Y);
+                        }
                     }
+                    catch (Exception e)
+                    {
+                        MessageBox.Show(e.Message);
+                        return;
+                    }
+
 
                     GameResult gameResult = bacteriaSurviveCalculator.EvaluteGrid();
                     int winnerType = 0;
@@ -155,20 +177,19 @@ namespace BacteriaSurvive.UI
                         winnerType = (int)gameResult.Winner.Value;
 
                     file.WriteLine(i + " " + gameResult.IterationNumber + " " + winnerType);
-
-                    Dispatcher.Invoke(updProgress, new object[] { System.Windows.Controls.ProgressBar.ValueProperty, ++value });
-
+                    Dispatcher.Invoke(updProgress, new object[] { System.Windows.Controls.ProgressBar.ValueProperty, value++});
                 }
 
             }
         }
 
 
+
         private void btnRun_Click(object sender, RoutedEventArgs e)
         {
 
-
             
+
 
             uint areaWidth;
             uint areaHeight;
@@ -193,6 +214,7 @@ namespace BacteriaSurvive.UI
             try
             {
                 gamesCount = uint.Parse(tbGamesCount.Text);
+                
             }
             catch (Exception error)
             {
@@ -200,7 +222,7 @@ namespace BacteriaSurvive.UI
                 return;
             }
 
-                string resultsDir = Path.Combine(tbResultsDir.Text, "рассчет от " + DateTime.Now.ToString("yyyyMMdd") + "_" + DateTime.Now.ToString("hh_mm"));
+            string resultsDir = Path.Combine(tbResultsDir.Text, "рассчет от " + DateTime.Now.ToString("yyyyMMdd") + "_" + DateTime.Now.ToString("hh_mm"));
             if (!Directory.Exists(resultsDir))
                 Directory.CreateDirectory(resultsDir);
 
@@ -211,168 +233,133 @@ namespace BacteriaSurvive.UI
 
             bool isGridSaverEnebled = chkGridSaverEnabled.IsChecked.HasValue && chkGridSaverEnabled.IsChecked.Value;
 
-            IList<BacteriaCoordinates> players=new List<BacteriaCoordinates>();
-
-             if (chkAEnabled.IsChecked.HasValue && chkAEnabled.IsChecked.Value)
-                    {
-                        try
-                        {
-                            uint aX = uint.Parse(tbAStoneX.Text);
-                            uint aY = uint.Parse(tbAStoneY.Text);
-                            int aStonePercent = int.Parse(tbAStonePercent.Text);
-                            int aPaperPercent = int.Parse(tbAPaperPercent.Text);
-                            int aScissorsPercent = int.Parse(tbAScissorsPercent.Text);
-                            int aMutation = int.Parse(tbAStoneMutationLimit.Text);
-                            if (aMutation % 2 != 0)
-                                throw new ApplicationException("бактерия А: Константа мутации должна быть четным числом");
-                            Bacteria bacteriaA = new Bacteria(aStonePercent, aScissorsPercent, aPaperPercent,
-                                                              BacteriaType.A, aMutation);
-                            players.Add( new BacteriaCoordinates(bacteriaA, aX, aY));
-                        }
-                        catch (Exception error)
-                        {
-                            MessageBox.Show("один из параметров А бактерии задан неверно ");
-                            return;
-                        }
-                    }
-
-                    if (chkBEnabled.IsChecked.HasValue && chkBEnabled.IsChecked.Value)
-                    {
-
-                        try
-                        {
-                            uint bX = uint.Parse(tbBStoneX.Text);
-                            uint bY = uint.Parse(tbBStoneY.Text);
-                            int bStonePercent = int.Parse(tbBStonePercent.Text);
-                            int bPaperPercent = int.Parse(tbBPaperPercent.Text);
-                            int bScissorsPercent = int.Parse(tbBScissorsPercent.Text);
-                            int bMutation = int.Parse(tbBStoneMutationLimit.Text);
-                            if (bMutation % 2 != 0)
-                                throw new ApplicationException("бактерия B: Константа мутации должна быть четным числом");
-                            Bacteria bacteriaB = new Bacteria(bStonePercent, bScissorsPercent, bPaperPercent,
-                                                              BacteriaType.B, bMutation);
-                            players.Add(new BacteriaCoordinates(bacteriaB, bX, bY));
-                        }
-                        catch (Exception error)
-                        {
-                            MessageBox.Show("один из параметров B бактерии задан неверно ");
-                            return;
-                        }
-                    }
+            IList<BacteriaSettings> players = new List<BacteriaSettings>();
 
 
-                    if (chkCEnabled.IsChecked.HasValue && chkCEnabled.IsChecked.Value)
-                    {
+            for (int i = 0; i < lvPlayers.Items.Count; i++)
+            {
 
-                        try
-                        {
-                            uint cX = uint.Parse(tbCStoneX.Text);
-                            uint cY = uint.Parse(tbCStoneY.Text);
-                            int cStonePercent = int.Parse(tbCStonePercent.Text);
-                            int cPaperPercent = int.Parse(tbCPaperPercent.Text);
-                            int cScissorsPercent = int.Parse(tbCScissorsPercent.Text);
-                            int cMutation = int.Parse(tbCStoneMutationLimit.Text);
-                            if (cMutation % 2 != 0)
-                                throw new ApplicationException("бактерия C: Константа мутации должна быть четным числом");
-                            Bacteria bacteriaC = new Bacteria(cStonePercent, cScissorsPercent, cPaperPercent,
-                                                              BacteriaType.C, cMutation);
-                            players.Add( new BacteriaCoordinates(bacteriaC, cX, cY));
-                        }
-                        catch (Exception error)
-                        {
-                            MessageBox.Show("один из параметров C бактерии задан неверно ");
-                            return;
-                        }
+                BacteriaSettings currBacteriaSettings = (BacteriaSettings)lvPlayers.Items[i];
+                try
+                {
+                    currBacteriaSettings.Bacteria.VerifyProperties();
+                    players.Add(currBacteriaSettings);
+                }
+                catch (Exception error)
+                {
+                    MessageBox.Show(String.Format("Один из параметров  бактерии c индексом {0} задан неверно. Ошибка: {1} ", i, error.Message));
+                    return;
+                }
 
-                    }
 
+            }
 
 
             progressBar.Maximum = gamesCount;
             progressBar.Value = 0;
 
-            CalculationParams calculationParams = new CalculationParams(gamesCount, areaWidth, areaHeight, stepCount,
+
+
+
+            IList<Point> nodes = new List<Point>();
+
+
+
+            for (int i = 0; i < lvNodes.Items.Count; i++)
+            {
+
+                Point currNode = (Point)lvNodes.Items[i];
+                nodes.Add(currNode);
+            }
+
+
+
+            int startGameIndex = 0;
+            int gamesOnThread = (int)gamesCount/4;
+            int endGameIndex = startGameIndex+gamesOnThread;
+
+            CalculationParams calculationParams = new CalculationParams((uint)startGameIndex, (uint)endGameIndex, areaWidth, areaHeight, stepCount, nodes,
                                                                         resultsDir, isCountSaverEnebled,
                                                                         isVectorSaverEnebled, isGridSaverEnebled,
                                                                         players);
-            worker.RunWorkerAsync(calculationParams);
+
+            startGameIndex = endGameIndex;
+            endGameIndex = startGameIndex + gamesOnThread;
+            CalculationParams calculationParams1 = new CalculationParams((uint)startGameIndex, (uint)endGameIndex, areaWidth, areaHeight, stepCount, nodes,
+                                                                        resultsDir, isCountSaverEnebled,
+                                                                        isVectorSaverEnebled, isGridSaverEnebled,
+                                                                        players);
+            startGameIndex = endGameIndex;
+            endGameIndex = startGameIndex + gamesOnThread;
+            CalculationParams calculationParams2 = new CalculationParams((uint)startGameIndex, (uint)endGameIndex, areaWidth, areaHeight, stepCount, nodes,
+                                                                        resultsDir, isCountSaverEnebled,
+                                                                        isVectorSaverEnebled, isGridSaverEnebled,
+                                                                        players);
+
+            startGameIndex = endGameIndex;
+            endGameIndex = (int)gamesCount;
+            CalculationParams calculationParams3 = new CalculationParams((uint)startGameIndex, (uint)endGameIndex, areaWidth, areaHeight, stepCount, nodes,
+                                                                        resultsDir, isCountSaverEnebled,
+                                                                        isVectorSaverEnebled, isGridSaverEnebled,
+                                                                        players);
+
+
+
+
+
+            Task.Factory.StartNew(() =>
+            {
+
+            /*    Thread.BeginThreadAffinity();
+                int threadId = Thread.CurrentThread.ManagedThreadId;
+                Process proc = Process.GetCurrentProcess();
+                ProcessThread procThread = proc.Threads.Cast<ProcessThread>().Single(
+                    pt => pt.Id == threadId
+                );
+                procThread.ProcessorAffinity = new IntPtr(0x01);
+                //
+                // work
+                //*/
+
+
+                RunGamesCalculation(calculationParams);
+
+
+                /*procThread.ProcessorAffinity = new IntPtr(0xFFFF);
+                Thread.EndThreadAffinity();*/
+
+            }, TaskCreationOptions.LongRunning
+                );
+
+
+            Task.Factory.StartNew(() =>
+            {
+
+                RunGamesCalculation(calculationParams2);
+            }, TaskCreationOptions.LongRunning
+              );
+
+
+            Task.Factory.StartNew(() =>
+            {
+
+                RunGamesCalculation(calculationParams1);
+            }, TaskCreationOptions.LongRunning
+             );
+
+            Task.Factory.StartNew(() =>
+            {
+
+                RunGamesCalculation(calculationParams3);
+            }, TaskCreationOptions.LongRunning
+           );
+
+
         }
 
-        private void chkAEnabled_Checked(object sender, RoutedEventArgs e)
-        {
-            if (chkAEnabled.IsChecked.HasValue && chkAEnabled.IsChecked.Value)
-            {
-                if (tbAPaperPercent==null)
-                    return;
-                tbAPaperPercent.Visibility = Visibility.Visible;
-                tbAScissorsPercent.Visibility = Visibility.Visible;
-                tbAStoneMutationLimit.Visibility = Visibility.Visible;
-                tbAStonePercent.Visibility = Visibility.Visible;
-                tbAStoneX.Visibility = Visibility.Visible;
-                tbAStoneY.Visibility = Visibility.Visible;
-                
-            }
-            else
-            {
-                tbAPaperPercent.Visibility = Visibility.Hidden;
-                tbAScissorsPercent.Visibility = Visibility.Hidden;
-                tbAStoneMutationLimit.Visibility = Visibility.Hidden;
-                tbAStonePercent.Visibility = Visibility.Hidden;
-                tbAStoneX.Visibility = Visibility.Hidden;
-                tbAStoneY.Visibility = Visibility.Hidden;
-                
-            }
-        }
 
-        private void chkBEnabled_Checked(object sender, RoutedEventArgs e)
-        {
-            if (chkBEnabled.IsChecked.HasValue && chkBEnabled.IsChecked.Value)
-            {
-                if (tbBPaperPercent == null)
-                    return;
-                tbBPaperPercent.Visibility = Visibility.Visible;
-                tbBScissorsPercent.Visibility = Visibility.Visible;
-                tbBStoneMutationLimit.Visibility = Visibility.Visible;
-                tbBStonePercent.Visibility = Visibility.Visible;
-                tbBStoneX.Visibility = Visibility.Visible;
-                tbBStoneY.Visibility = Visibility.Visible;
 
-            }
-            else
-            {
-                tbBPaperPercent.Visibility = Visibility.Hidden;
-                tbBScissorsPercent.Visibility = Visibility.Hidden;
-                tbBStoneMutationLimit.Visibility = Visibility.Hidden;
-                tbBStonePercent.Visibility = Visibility.Hidden;
-                tbBStoneX.Visibility = Visibility.Hidden;
-                tbBStoneY.Visibility = Visibility.Hidden;
-            }
-        }
 
-        private void chkCEnabled_Checked(object sender, RoutedEventArgs e)
-        {
-            if (chkCEnabled.IsChecked.HasValue && chkCEnabled.IsChecked.Value)
-            {
-                if (tbCPaperPercent == null)
-                    return;
-                tbCPaperPercent.Visibility = Visibility.Visible;
-                tbCScissorsPercent.Visibility = Visibility.Visible;
-                tbCStoneMutationLimit.Visibility = Visibility.Visible;
-                tbCStonePercent.Visibility = Visibility.Visible;
-                tbCStoneX.Visibility = Visibility.Visible;
-                tbCStoneY.Visibility = Visibility.Visible;
-
-            }
-            else
-            {
-                tbCPaperPercent.Visibility = Visibility.Hidden;
-                tbCScissorsPercent.Visibility = Visibility.Hidden;
-                tbCStoneMutationLimit.Visibility = Visibility.Hidden;
-                tbCStonePercent.Visibility = Visibility.Hidden;
-                tbCStoneX.Visibility = Visibility.Hidden;
-                tbCStoneY.Visibility = Visibility.Hidden;
-            }
-        }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
@@ -382,10 +369,47 @@ namespace BacteriaSurvive.UI
                 if (!string.IsNullOrWhiteSpace(_folderBrowserDialog.SelectedPath))
                     tbResultsDir.Text = _folderBrowserDialog.SelectedPath;
             }
-            
+
+        }
+
+
+        private void BtnAddbacteria_OnClick(object sender, RoutedEventArgs e)
+        {
+            lvPlayers.Items.Add(new BacteriaSettings(new Bacteria(100, 0, 0, BacteriaType.A, 4), 0, 0));
+        }
+
+        private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (lvPlayers.SelectedItem != null)
+            {
+                lvPlayers.Items.Remove(lvPlayers.SelectedItem);
+
+            }
+            else
+            {
+                MessageBox.Show("Выберите бактерию для удаления");
+            }
+        }
+
+        private void BtnRemoveNode_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (lvNodes.SelectedItem != null)
+            {
+                lvNodes.Items.Remove(lvNodes.SelectedItem);
+
+            }
+            else
+            {
+                MessageBox.Show("Choose node for remove");
+            }
+        }
+
+        private void BtnAddNode_OnClick(object sender, RoutedEventArgs e)
+        {
+            lvNodes.Items.Add(new Point( 0, 0));
         }
     }
 
 
-    
+
 }

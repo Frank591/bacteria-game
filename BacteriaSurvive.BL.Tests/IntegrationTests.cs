@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using BacteriaSurvive.BL.GameArea;
 using BacteriaSurvive.BL.GridHandlers;
 using BacteriaSurvive.BL.GridHandlers.Output;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -10,12 +11,17 @@ namespace BacteriaSurvive.BL.Tests
     public class IntegrationTests
     {
 
+
+        
+
+
+
         [TestMethod]
         public void RunGame100Times()
         {
 
 
-            string resultsDir = @"D:\temp\тестовый расчет_" + DateTime.Now.ToString("yyyyMMdd") + "_" + DateTime.Now.ToString("hh_mm");
+            string resultsDir = @"C:\temp\тестовый расчет_" + DateTime.Now.ToString("yyyyMMdd") + "_" + DateTime.Now.ToString("hh_mm");
 
             if (!Directory.Exists(resultsDir))
                 Directory.CreateDirectory(resultsDir);
@@ -68,7 +74,10 @@ namespace BacteriaSurvive.BL.Tests
                     handlersQueue.Add(countHandler);
 
 
-                    BacteriaSurviveCalculator bacteriaSurviveCalculator = new BacteriaSurviveCalculator(4, 4, 100, handlersQueue);
+                    SquareGameAreaFactory<Bacteria> bacteriaAreaFactory = new SquareGameAreaFactory<Bacteria>(4, 4);
+                    SquareGameAreaFactory<GameCenter> gameCenterAreaFactory = new SquareGameAreaFactory<GameCenter>(4, 4);
+
+                    BacteriaSurviveCalculator bacteriaSurviveCalculator = new BacteriaSurviveCalculator(100, handlersQueue,bacteriaAreaFactory,gameCenterAreaFactory);
 
                     bacteriaSurviveCalculator.InsertBacteria(new Bacteria(100, 0, 0, BacteriaType.A, 10), 0, 0);
                     bacteriaSurviveCalculator.InsertBacteria(new Bacteria(0, 100, 0, BacteriaType.B, 8), 3, 0);
@@ -92,6 +101,6 @@ namespace BacteriaSurvive.BL.Tests
             }
 
         }
-        
+
     }
 }
