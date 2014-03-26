@@ -9,7 +9,65 @@ namespace BacteriaSurvive.BL.Tests
     [TestClass]
     public class GameAreaTests
     {
+        #region defects 
 
+        /*
+         * test cases for https://github.com/Frank591/bacteria-game/issues/1
+         * incorrect work  polygonGameArea.IsInArea
+         */
+        [TestMethod]
+        public void GitIssue1Case1()
+        {
+            IList<Point> nodePoints = new List<Point>();
+            nodePoints.Add(new Point(0, 0));
+            nodePoints.Add(new Point(5, 0));
+            nodePoints.Add(new Point(7, 10));
+
+            PolygonGameArea<Object> polygonGameArea = new PolygonGameArea<Object>(20, 20, nodePoints);
+
+            //outer points
+            Assert.AreEqual(polygonGameArea.IsInArea(0, 4), false);
+            Assert.AreEqual(polygonGameArea.IsInArea(0, 8), false);
+            Assert.AreEqual(polygonGameArea.IsInArea(11, 11), false);
+
+            //inner points
+            Assert.AreEqual(polygonGameArea.IsInArea(0, 0), true);
+            Assert.AreEqual(polygonGameArea.IsInArea(3, 1), true);
+            Assert.AreEqual(polygonGameArea.IsInArea(3, 2), true);
+            Assert.AreEqual(polygonGameArea.IsInArea(5, 3), true);
+            Assert.AreEqual(polygonGameArea.IsInArea(6, 8), true);
+          
+        }
+
+        [TestMethod]
+        public void GitIssue1Case2()
+        {
+            IList<Point> nodePoints = new List<Point>();
+            nodePoints.Add(new Point(0, 0));
+            nodePoints.Add(new Point(10, 2));
+            nodePoints.Add(new Point(10, 0));
+
+            PolygonGameArea<Object> polygonGameArea = new PolygonGameArea<Object>(20, 20, nodePoints);
+            //outer points
+            Assert.AreEqual(polygonGameArea.IsInArea(0, 4), false);
+            Assert.AreEqual(polygonGameArea.IsInArea(0, 1), false);
+            Assert.AreEqual(polygonGameArea.IsInArea(11, 11), false);
+            Assert.AreEqual(polygonGameArea.IsInArea(1, 3), false);
+            Assert.AreEqual(polygonGameArea.IsInArea(10, 3), false);
+            Assert.AreEqual(polygonGameArea.IsInArea(3, 2), false);
+
+            //inner points
+            Assert.AreEqual(polygonGameArea.IsInArea(0, 0), true);
+            Assert.AreEqual(polygonGameArea.IsInArea(9, 0), true);
+            Assert.AreEqual(polygonGameArea.IsInArea(9, 1), true);
+            Assert.AreEqual(polygonGameArea.IsInArea(9, 2), true);
+            Assert.AreEqual(polygonGameArea.IsInArea(6, 1), true);
+            Assert.AreEqual(polygonGameArea.IsInArea(3, 1), true);
+        }
+
+
+
+        #endregion
 
         [TestMethod]
         public void TriangleAreaTest()

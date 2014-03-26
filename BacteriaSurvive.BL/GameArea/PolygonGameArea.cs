@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 
 namespace BacteriaSurvive.BL.GameArea
 {
@@ -8,6 +9,8 @@ namespace BacteriaSurvive.BL.GameArea
     {
         private readonly IList<Point> _nodePoints;
         private readonly IList<Point> _boundaryPoints;
+        private readonly Point _originPoint=new Point(0,0);
+        private const int MIN_OUTER_POINTS_WITH_SAME_COORDINATE_FOR_INNER_POINT = 2; 
 
         public PolygonGameArea(int width, int height, IList<Point> nodePoints)
             : base(width, height)
@@ -50,9 +53,9 @@ namespace BacteriaSurvive.BL.GameArea
 
         public override bool IsInArea(int x, int y)
         { 
-            if ((x<0)||(x>Width))
+            if ((x<_originPoint.X)||(x>Width))
                 throw new ArgumentOutOfRangeException("071B2775-8F78-40EB-816F-F6CB7BDBD10E: x<0 or x>area width");
-            if ((y < 0) || (y > Height))
+            if ((y < _originPoint.Y) || (y > Height))
                 throw new ArgumentOutOfRangeException("071B2775-8F78-40EB-816F-F6CB7BDBD11E: y<0 or y>area height");
 
          
@@ -61,47 +64,23 @@ namespace BacteriaSurvive.BL.GameArea
             if (GameAreaUtilsService.IsContainsInPoints(new Point(x,y),_boundaryPoints))
                 return true;
 
-            
-            
-            int topY = y + 1;
-            IList<Point> topCrossPoints = new List<Point>();
-            
-            IList<Point> crossPoints = new List<Point>();
 
-            int botY = y - 1;
-            IList<Point> botCrossPoints = new List<Point>();
+            IList<Point> boundaryPointsWithSameX = GameAreaUtilsService.GetPointsByX(_boundaryPoints, x);
+            if (boundaryPointsWithSameX.Count < MIN_OUTER_POINTS_WITH_SAME_COORDINATE_FOR_INNER_POINT)
+                return false;
+            int minY = boundaryPointsWithSameX.Min(p => p.Y);
+            int maxY = boundaryPointsWithSameX.Max(p => p.Y);
+            bool isYBetween = (minY < y) && (y < maxY);
 
-            for (int xIterator = x; xIterator <= Width; xIterator++)
-            {
-                Point currTopPoint = new Point(xIterator, topY);
+            IList<Point> boundaryPointsWithSameY = GameAreaUtilsService.GetPointsByY(_boundaryPoints, y);
+            if (boundaryPointsWithSameY.Count < MIN_OUTER_POINTS_WITH_SAME_COORDINATE_FOR_INNER_POINT)
+                return false;
+            int minX = boundaryPointsWithSameY.Min(p => p.X);
+            int maxX = boundaryPointsWithSameY.Max(p => p.X);
+            bool isXBetween = (minX < x) && (x < maxX);
 
-                if (_boundaryPoints.Contains(currTopPoint))
-                {
-                    topCrossPoints.Add(currTopPoint);
-                }
 
-                Point currRayPoint = new Point(xIterator, y);
-                if (_boundaryPoints.Contains(currRayPoint))
-                {
-                    crossPoints.Add(currRayPoint);
-                }
-
-                Point currBotPoint = new Point(xIterator, botY);
-                if (_boundaryPoints.Contains(currBotPoint))
-                {
-                    botCrossPoints.Add(currBotPoint);
-                }
-            }
-            if (crossPoints.Count%2 == 0)
-            {
-                int maxXStep = GameAreaUtilsService.GetMaxXStep(crossPoints);
-                if (maxXStep>1)
-                    return false;
-            }
-
-            if ((topCrossPoints.Count>0) && (botCrossPoints.Count>0))
-                return true;
-            return false;
+            return isXBetween&&isYBetween;
         }
     }
 }

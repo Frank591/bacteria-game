@@ -8,6 +8,9 @@ namespace BacteriaSurvive.BL.GameArea
 {
     public static class GameAreaUtilsService
     {
+        //distance from point to line can be less or equal than 0.5 (distanceToPoine<=0.5)
+        private  const double MAX_DISTANCE_TO_LINE = 0.5;
+
         public static IList<Point> GetLinePoints(Point point1, Point point2)
         {
 
@@ -51,7 +54,10 @@ namespace BacteriaSurvive.BL.GameArea
                 {
                     for (int y = minY; y <= maxY; y++)
                     {
-                        if (y == Math.Round(k * x + b))
+
+                        double distanceToTheLine = (Math.Abs(k*x - y + b))/(Math.Sqrt(k*k + 1));
+
+                        if (distanceToTheLine<MAX_DISTANCE_TO_LINE)
                         {
                             linePoints.Add(new Point(x, y));
                         }
@@ -70,6 +76,17 @@ namespace BacteriaSurvive.BL.GameArea
             return points.Contains(target);
         }
 
+        public static IList<Point> GetPointsByX(IList<Point> source, int x)
+        {
+            return source.Where(p => p.X == x).ToList();
+        }
+
+        public static IList<Point> GetPointsByY(IList<Point> source, int y)
+        {
+            return source.Where(p => p.Y == y).ToList();
+        } 
+
+     
 
         public static int GetMaxXStep(IList<Point> points)
         {
